@@ -1,3 +1,4 @@
+#!/bin/sh
 ls -1 *.json | sed 's/.json$//' | while read col; do 
-    mongoimport -d db_name -c $col < $col.json; 
+    mongoimport --jsonArray --db wikipedia --collection revisions < $col.json; 
 done
