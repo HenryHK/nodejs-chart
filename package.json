@@ -1,0 +1,28 @@
+{
+  "name": "nodejs-chart",
+  "version": "1.0.0",
+  "description": "This is assignment 2 of COMP5347 Web Application Development, The University of Sydney.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HenryHK/nodejs-chart.git"
+  },
+  "author": "lhan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HenryHK/nodejs-chart/issues"
+  },
+  "homepage": "https://github.com/HenryHK/nodejs-chart#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "ejs": "^2.5.6",
+    "express": "^4.15.3",
+    "express-session": "^1.15.2",
+    "mongoose": "^4.9.10",
+    "path": "^0.12.7",
+    "pug": "^2.0.0-rc.1"
+  }
+}
