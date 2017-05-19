@@ -17,6 +17,21 @@ RevisionSchema.statics.findTitleLatestRev = function(title, callback) {
         .exec(callback)
 }
 
+RevisionSchema.statics.getAllTitles = function(callback) {
+
+    return this.find({}, { title: 1, _id: 0 }).exec(callback);
+}
+
 var Revision = mongoose.model('Revision', RevisionSchema, 'revisions')
+
+// Revision.aggregate([{ "$group": { "title": "$title" } }], function(err, result) {
+//     if (err) {
+//         console.log("Aggregation Error")
+//     } else {
+//         console.log("The titles: ")
+//         console.log(results)
+//     }
+// });
+
 
 module.exports = Revision
