@@ -26,40 +26,7 @@ db.bot.find().forEach(function(user){
 
 db.revisions.updateMany({"anon":{"$exists":false}, "type":{"$exists":false}},{$set:{type:"regular"}})
 
-
-db.revisions.find({"anon":{"$exists":false}}).forEach(function(revision){
-    var admin = db.admin.find({name:revision.user}, {name:1})
-    var bot = db.bot.find({name:revision.user}, {name:1})
-    if(admin!=null){
-        db.revisions.update(
-            {user:revision.user},
-            {$set:
-                {
-                    type:"admin"
-                }
-            }
-        );
-    }else if(bot!=null){
-        db.revisions.update(
-            {user:revision.user},
-            {$set:
-                {
-                    type:"bot"
-                }
-            }
-        );
-    }else{
-        db.revisions.update(
-            {user:revision.user},
-            {$set:
-                {
-                    type:"regular"
-                }
-            }
-        );
-    }
-})
-
+db.revisions.updateMany({},{$set:{timestamp:new Date(timestamp)}})
 #### The articla with the most number of revisions
 ```
 db.revisions.aggregate([
@@ -107,18 +74,14 @@ db.revisions.aggregate([
 ```
 db.revisions.aggregate([
     {
-        '$group':
-        {'_id':{title:'title'}, maxTime:{$max:'$timestamp'}, minTime:{$min:'$timestamp'}}
-    },
-    {
-        '$project':{
-            '_id':0,
-            'title':'$_id.title',
-            'age': {$subtract:['$maxTime', '$minTime']}
-        }
-    },
-    {'$sort':{'age':-1}},
-    {'$limit':1}
+            '$group': {
+                '_id': { title: '$title' },
+                maxTime: { $max: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } },
+                minTime: { $min: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } }
+            }
+        },
+        
+        { '$limit': 10 }
 ])
 ```
 
@@ -127,18 +90,23 @@ db.revisions.aggregate([
 ```
 db.revisions.aggregate([
     {
-        '$group':
-        {'_id':{title:'title'}, maxTime:{$max:'$timestamp'}, minTime:{$min:'$timestamp'}}
-    },
-    {
-        '$project':{
-            '_id':0,
-            'title':'$_id.title',
-            'age': {$subtract:['$maxTime', '$minTime']}
-        }
-    },
-    {'$sort':{'age':1}},
-    {'$limit':1}
+            '$group': {
+                '_id': { title: '$title' },
+                maxTime: { $max: '$timestamp' },
+                minTime: { $min: '$timestamp' }
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'title': '$_id.title',
+                'age': { $subtract: [new Date('$maxTime'), new Date('$minTime')] }
+            }
+        },
+        {
+            '$sort': { 'age': 1 }
+        },
+        { '$limit': 1 }
 ])
 ```
 

@@ -62,8 +62,8 @@ RevisionSchema.statics.findLongestHistoryArticle = function(callback) {
     var findLongestHistoryArticlePipeline = [{
             '$group': {
                 '_id': { title: '$title' },
-                maxTime: { $max: '$timestamp' },
-                minTime: { $min: '$timestamp' }
+                maxTime: { $max: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } },
+                minTime: { $min: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } }
             }
         },
         {
