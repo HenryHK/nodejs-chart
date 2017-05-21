@@ -10,6 +10,138 @@ var RevisionSchema = new mongoose.Schema({
     versionKey: false
 });
 
+RevisionSchema.statics.findMostRevisedArticle = function(callback) {
+    var mostRevisedArticlePipeline = [
+        { '$group': { '_id': "$title", 'numOfRevisions': { $sum: 1 } } },
+        { '$sort': { numOfRevisions: -1 } },
+        { '$limit': 1 }
+    ]
+
+    this.aggregate(mostRevisedArticlePipeline, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+RevisionSchema.statics.findLeastRevisedArticle = function(callback) {
+    var mostRevisedArticlePipeline = [
+        { '$group': { '_id': "$title", 'numOfRevisions': { $sum: 1 } } },
+        { '$sort': { numOfRevisions: 1 } },
+        { '$limit': 1 }
+    ]
+
+    this.aggregate(mostRevisedArticlePipeline, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+RevisionSchema.statics.findArticleWithLargestGroupOfUsers = function(callback) {
+    var articleWithLargestGroupOfUsersPipeLine = [
+        { '$match': { 'anon': { '$exists': false }, 'type': { '$ne': 'bot' } } },
+        { '$group': { '_id': { title: '$title', user: '$user' } } },
+        { '$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
+        { '$sort': { 'count': -1 } },
+        { '$limit': 1 }
+    ];
+
+    this.aggregate(articleWithLargestGroupOfUsersPipeLine, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+RevisionSchema.statics.findArticleWithSmallestGroupOfUsers = function(callback) {
+    var articleWithLargestGroupOfUsersPipeLine = [
+        { '$match': { 'anon': { '$exists': false }, 'type': { '$ne': 'bot' } } },
+        { '$group': { '_id': { title: '$title', user: '$user' } } },
+        { '$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
+        { '$sort': { 'count': 1 } },
+        { '$limit': 1 }
+    ];
+
+    this.aggregate(articleWithLargestGroupOfUsersPipeLine, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+RevisionSchema.statics.findLongestHistoryArticle = function(callback) {
+
+    var findLongestHistoryArticlePipeline = [{
+            '$group': {
+                '_id': { title: '$title' },
+                maxTime: { $max: '$timestamp' },
+                minTime: { $min: '$timestamp' }
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'title': '$_id.title',
+                'age': { $subtract: ['$maxTime', '$minTime'] }
+            }
+        },
+        {
+            '$sort': { 'age': -1 }
+        },
+        { '$limit': 1 }
+    ]
+
+    this.aggregate(findLongestHistoryArticlePipeline, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+RevisionSchema.statics.findShortestHistoryArticle = function(callback) {
+
+    var findLeastHistoryArticlePipeline = [{
+            '$group': {
+                '_id': { title: '$title' },
+                maxTime: { $max: '$timestamp' },
+                minTime: { $min: '$timestamp' }
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'title': '$_id.title',
+                'age': { $subtract: ['$maxTime', '$minTime'] }
+            }
+        },
+        {
+            '$sort': { 'age': 1 }
+        },
+        { '$limit': 1 }
+    ]
+
+    this.aggregate(findLeastHistoryArticlePipeline, function(err, results) {
+        if (err) {
+            console.log("Aggregation Error")
+        } else {
+            callback(results)
+        }
+    });
+}
+
+//**************************************************************** */
+/*
 RevisionSchema.statics.findAllArticles = function(callback) {
 
     var findAllArticlesPipeline = [{
@@ -382,7 +514,7 @@ RevisionSchema.statics.findUsersOfArticle = function(article, callback) {
         }
     });
 }
-
+*/
 
 var Revision = mongoose.model('Revision', RevisionSchema, 'revisions');
 
