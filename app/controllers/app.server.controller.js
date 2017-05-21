@@ -22,15 +22,14 @@ module.exports.showOverall = function(req, res) {
 }
 
 module.exports.showOne = function(req, res) {
-    Revision.aggregate();
-    Revision.getAllTitles(function(err, result) {
+    //Revision.aggregate();
+    Revision.getAllArticles(function(err, result) {
         if (err) {
             console.log("Get all titles failure!")
         } else {
             console.log(result);
-            var revision = result;
-            res.render("titleForm.pug", { revision: revision });
+            var article = result;
+            res.render("titleForm.pug", { article: article });
         }
     });
-    // res.render("titleForm.pug");
 }
