@@ -26,7 +26,13 @@ db.bot.find().forEach(function(user){
 
 db.revisions.updateMany({"anon":{"$exists":false}, "type":{"$exists":false}},{$set:{type:"regular"}})
 
-db.revisions.updateMany({},{$set:{timestamp:new Date(timestamp)}})
+ery for convert string to date object
+
+db.revisions.find().forEach(function(element){
+  element.timestamp = new Date(element.timestamp);
+  db.revisions.save(element);
+})
+
 #### The articla with the most number of revisions
 ```
 db.revisions.aggregate([
@@ -73,15 +79,24 @@ db.revisions.aggregate([
 
 ```
 db.revisions.aggregate([
-    {
+{
             '$group': {
                 '_id': { title: '$title' },
-                maxTime: { $max: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } },
-                minTime: { $min: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } }
+                maxTime: { $max: '$timestamp' },
+                minTime: { $min: '$timestamp' }
             }
         },
-        
-        { '$limit': 10 }
+        {
+            '$project': {
+                '_id': 0,
+                'title': '$_id.title',
+                'age': { $subtract: ['$maxTime', '$minTime'] }
+            }
+        },
+        {
+            '$sort': { 'age': -1 }
+        },
+        { '$limit': 1 }
 ])
 ```
 

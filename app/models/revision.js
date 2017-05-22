@@ -62,8 +62,8 @@ RevisionSchema.statics.findLongestHistoryArticle = function(callback) {
     var findLongestHistoryArticlePipeline = [{
             '$group': {
                 '_id': { title: '$title' },
-                maxTime: { $max: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } },
-                minTime: { $min: { "$subtract": ['$timestamp', new Date(1970 - 1 - 1)] } }
+                maxTime: { $max: '$timestamp' },
+                minTime: { $min: '$timestamp' }
             }
         },
         {
@@ -77,7 +77,7 @@ RevisionSchema.statics.findLongestHistoryArticle = function(callback) {
             '$sort': { 'age': -1 }
         },
         { '$limit': 1 }
-    ]
+    ];
 
     this.aggregate(findLongestHistoryArticlePipeline).exec(callback);
 }
@@ -102,7 +102,7 @@ RevisionSchema.statics.findShortestHistoryArticle = function(callback) {
             '$sort': { 'age': 1 }
         },
         { '$limit': 1 }
-    ]
+    ];
 
     this.aggregate(findLeastHistoryArticlePipeline).exec(callback);
 }
