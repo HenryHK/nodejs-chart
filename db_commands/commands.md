@@ -71,8 +71,16 @@ db.revisions.aggregate([
     {'$group': { '_id': { title: '$title', user: '$user' } } },
     {'$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
     {'$sort': { 'count': 1 } },
-    {'$limit': 1 }
+    {'$limit': 5 }
 ])
+
+db.revisions.aggregate([
+        { '$match': { 'anon': { '$exists': false }, 'type': { '$ne': 'bot' } } },
+        { '$group': { '_id': { title: '$title', user: '$user' } } },
+        { '$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
+        { '$sort': { 'count': 1 } },
+        { '$limit': 1 }
+    ])
 ```
 
 #### The artical with the longest history
@@ -194,4 +202,41 @@ db.revisions.aggregate([{
             }
 
         ])
+
+db.revisions.aggregate([{
+            '$match': { 'title': 'Germany' }
+        },
+        {
+            '$group': {
+                '_id': { user: '$user' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'type': '$_id.user', 'count': 1, '_id': 0 }
+        }
+
+        ])
+```
+
+```
+db.revisions.aggregate([{
+            '$match': {
+                'title': 'Australia'
+            }
+        },
+        {
+            '$group': {
+                '_id': { year: { $year: '$timestamp' }, type: '$type' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'year': '$_id.year', 'type': '$_id.type', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { year: 1 }
+        }
+
+    ])
 ```

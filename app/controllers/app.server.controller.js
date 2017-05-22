@@ -21,6 +21,11 @@ module.exports.getLatest = function(req, res) {
             numOfRevisions: numOfRevisions,
             top5Users: top5Users
         });
+        // res.json({
+        //     title: title,
+        //     numOfRevisions: numOfRevisions,
+        //     top5Users: top5Users
+        // });
     });
 
     Revision.getNumberOfRevisions(title, function(err, result) {
@@ -41,6 +46,48 @@ module.exports.getLatest = function(req, res) {
             latch.signal();
         }
     });
+    //Revision.fin
+}
+
+module.exports.sendOverallData = function(req, res) {
+
+    var pieChartData;
+    var barChartData;
+
+    function CDL(countdown, completion) {
+        this.signal = function() {
+            if (--countdown < 1) completion();
+        };
+    }
+    var latch = new CDL(2, function() {
+        console.log("latch.signal() was called 2 times.");
+
+        res.json({
+            pieChartData: JSON.stringify(pieChartData),
+            barChartData: JSON.stringify(barChartData)
+        });
+    });
+
+    Revision.getDistributionByUser(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            pieChartData = result;
+            latch.signal();
+        }
+    });
+
+    Revision.getDistributionByUserAndYear(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            barChartData = result;
+            latch.signal();
+        }
+    });
+
 }
 
 module.exports.showOverall = function(req, res) {
@@ -50,6 +97,9 @@ module.exports.showOverall = function(req, res) {
     var articleWithSmallestGroupOfUsers
     var longestHistoryArticle;
     var shortestHistoryArticle;
+
+    var pieChartData;
+    var barChartData;
 
     function CDL(countdown, completion) {
         this.signal = function() {
@@ -64,8 +114,13 @@ module.exports.showOverall = function(req, res) {
             articleWithLargestGroupOfUsers: articleWithLargestGroupOfUsers,
             articleWithSmallestGroupOfUsers: articleWithSmallestGroupOfUsers,
             longestHistoryArticle: longestHistoryArticle,
-            shortestHistoryArticle: shortestHistoryArticle
+            shortestHistoryArticle: shortestHistoryArticle,
+
         });
+        // res.json("", {
+        //     pieChartData: pieChartData,
+        //     barChartData: barChartData
+        // });
     });
 
 
@@ -130,8 +185,6 @@ module.exports.showOverall = function(req, res) {
             latch.signal();
         }
     });
-
-
 
 }
 

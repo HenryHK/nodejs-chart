@@ -3,6 +3,9 @@ doctype html
 html(lang="en")
 head
 	title  Overall
+	script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+	script(src="https://www.gstatic.com/charts/loader.js")
+	script(src="js/showOverall.js")
 body
 	h1 Overall Data
 a(href="/showOne") Click here to go to the show one page
@@ -12,3 +15,7 @@ p The article edited by the most number of users is #{articleWithLargestGroupOfU
 p The article edited by the least number of users is #{articleWithSmallestGroupOfUsers}
 p The longest history article is #{longestHistoryArticle}
 p The shortest history revised article is #{shortestHistoryArticle}
+button#pie Pie Chart
+|
+button#bar Bar Chart
+div#myChart

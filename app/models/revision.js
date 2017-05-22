@@ -35,7 +35,7 @@ RevisionSchema.statics.findLeastRevisedArticle = function(callback) {
 
 RevisionSchema.statics.findArticleWithLargestGroupOfUsers = function(callback) {
     var articleWithLargestGroupOfUsersPipeLine = [
-        { '$match': { 'anon': { '$exists': false }, 'type': { '$ne': 'bot' } } },
+        { '$match': { 'anon': { '$exists': false } } },
         { '$group': { '_id': { title: '$title', user: '$user' } } },
         { '$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
         { '$sort': { 'count': -1 } },
@@ -47,7 +47,7 @@ RevisionSchema.statics.findArticleWithLargestGroupOfUsers = function(callback) {
 
 RevisionSchema.statics.findArticleWithSmallestGroupOfUsers = function(callback) {
     var articleWithLargestGroupOfUsersPipeLine = [
-        { '$match': { 'anon': { '$exists': false }, 'type': { '$ne': 'bot' } } },
+        { '$match': { 'anon': { '$exists': false } } },
         { '$group': { '_id': { title: '$title', user: '$user' } } },
         { '$group': { '_id': { title: '$_id.title' }, 'count': { $sum: 1 } } },
         { '$sort': { 'count': 1 } },
@@ -104,7 +104,42 @@ RevisionSchema.statics.findShortestHistoryArticle = function(callback) {
         { '$limit': 1 }
     ];
 
-    this.aggregate(findLeastHistoryArticlePipeline).exec(callback);
+    return this.aggregate(findLeastHistoryArticlePipeline).exec(callback);
+}
+
+RevisionSchema.statics.getDistributionByUser = function(callback) {
+    var distributionByUserPipeline = [{
+            '$group': {
+                '_id': { type: '$type' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'type': '$_id.type', 'count': 1, '_id': 0 }
+        }
+
+    ];
+
+    return this.aggregate(distributionByUserPipeline).exec(callback);
+}
+
+RevisionSchema.statics.getDistributionByUserAndYear = function(callback) {
+    var distributionByUserAndYearPipeline = [{
+            '$group': {
+                '_id': { year: { $year: '$timestamp' }, type: '$type' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'year': '$_id.year', 'type': '$_id.type', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { year: 1 }
+        }
+
+    ];
+
+    return this.aggregate(distributionByUserAndYearPipeline).exec(callback);
 }
 
 /**
@@ -161,6 +196,53 @@ RevisionSchema.statics.findTop5RegularUsers = function(title, callback) {
     ]
 
     return this.aggregate(top5RegularUsersPipeline).exec(callback);
+}
+
+RevisionSchema.statics.getDataByUser = function(title, callback) {
+    var dataByUserPipeLine = [{
+            '$match': { 'title': title }
+        },
+        {
+            '$group': {
+                '_id': { type: '$type' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'type': '$_id.type', 'count': 1, '_id': 0 }
+        }
+
+    ];
+
+    return this.aggregate(dataByUserPipeLine).exec(callback);
+}
+
+RevisionSchema.statics.getDataByYearAndUser = function(title, callback) {
+    var dataByYearAndUserPipeline = [{
+            '$match': {
+                'title': title
+            }
+        },
+        {
+            '$group': {
+                '_id': { year: { $year: '$timestamp' }, type: '$type' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'year': '$_id.year', 'type': '$_id.type', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { year: 1 }
+        }
+
+    ];
+
+    return this.aggregate(dataByYearAndUserPipeline).exec(callback)
+}
+
+RevisionSchema.statics.getDataForOneUser = function(title, user, callback) {
+
 }
 
 //*****************************************************************/
