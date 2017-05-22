@@ -8,7 +8,7 @@ head
 		 href='/css/tablestyle.css'
 		 media='screen')
 body
-	h2 The Latest Revision of #{title}
+	h2 Revision of #{title}
 	table
 		tr
 			th Field Name
@@ -16,10 +16,17 @@ body
 		
 		tr
 			td title
-			td #{revision.title}
+			td #{title}
 		tr
-			td user
-			td #{revision.user}
+			td Number of revisions
+			td #{numOfRevisions}
+	h3 top 5 users
+	table
 		tr
-			td timestamp
-			td #{revision.timestamp}
+			th User
+			th Num
+		-for(var a of top5Users){
+		tr
+			th #{a.user}
+			th #{a.count}
+		-}

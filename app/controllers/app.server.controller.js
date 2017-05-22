@@ -6,6 +6,9 @@ var Revision = require("../models/revision");
 module.exports.getLatest = function(req, res) {
     var title = req.query.title;
 
+    var numOfRevisions;
+    var top5Users;
+
     function CDL(countdown, completion) {
         this.signal = function() {
             if (--countdown < 1) completion();
@@ -13,16 +16,29 @@ module.exports.getLatest = function(req, res) {
     }
     var latch = new CDL(2, function() {
         console.log("latch.signal() was called 2 times.");
+        res.render("revision.pug", {
+            title: title,
+            numOfRevisions: numOfRevisions,
+            top5Users: top5Users
+        });
     });
 
-    Revision.findTitleLatestRev(title, function(err, result) {
-
+    Revision.getNumberOfRevisions(title, function(err, result) {
         if (err) {
-            console.log("Cannot find " + title + ",s latest revision!")
+            console.log(err);
         } else {
-            console.log(result)
-            var revision = result[0]
-            res.render('../views/revision.pug', { title: title, revision: revision })
+            console.log(result);
+            numOfRevisions = result;
+            latch.signal();
+        }
+    });
+    Revision.findTop5RegularUsers(title, function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            top5Users = result;
+            latch.signal();
         }
     });
 }
@@ -41,7 +57,7 @@ module.exports.showOverall = function(req, res) {
         };
     }
     var latch = new CDL(6, function() {
-        console.log("latch.signal() was called 7 times.");
+        console.log("latch.signal() was called 6 times.");
         res.render("overall.pug", {
             mostRevisedArticle: mostRevisedArticle,
             leastRevisedArticle: leastRevisedArticle,

@@ -135,3 +135,30 @@ db.revisions.find({})
 ```
 db.find({title:*title here*}).count()
 ```
+
+#### top5users
+
+```
+db.revisions.aggregate([
+
+        {
+            '$match': { title: "Australia", type: 'regular' }
+        },
+        {
+            '$group': {
+                '_id': { user: '$user' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'user': '$_id.user', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { 'count': -1 }
+        },
+        {
+            '$limit': 5
+        }
+
+    ])
+```

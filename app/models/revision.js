@@ -129,6 +129,40 @@ RevisionSchema.statics.getAllArticles = function(callback) {
     return this.aggregate(getAllArticlesPipeline).exec(callback);
 }
 
+RevisionSchema.statics.getNumberOfRevisions = function(title, callback) {
+    return this.find({ 'title': title })
+        .count()
+        .exec(callback);
+}
+
+RevisionSchema.statics.findTop5RegularUsers = function(title, callback) {
+
+    var top5RegularUsersPipeline = [
+
+        {
+            '$match': { title: title, type: 'regular' }
+        },
+        {
+            '$group': {
+                '_id': { user: '$user' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'user': '$_id.user', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { 'count': -1 }
+        },
+        {
+            '$limit': 5
+        }
+
+    ]
+
+    return this.aggregate(top5RegularUsersPipeline).exec(callback);
+}
+
 //*****************************************************************/
 RevisionSchema.statics.findTitleLatestRev = function(title, callback) {
 
