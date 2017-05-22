@@ -162,3 +162,36 @@ db.revisions.aggregate([
 
     ])
 ```
+
+#### distribute
+
+```
+db.revisions.aggregate([{
+                '$group': {
+                    '_id': { year: { $year: '$timestamp' }, type: '$type' },
+                    'count': { $sum: 1 }
+                }
+            },
+            {
+                '$project': { 'year': '$_id.year', 'type': '$_id.type', 'count': 1, '_id': 0 }
+            },
+            {
+                '$sort': { year: 1 }
+            }
+
+        ])
+```
+
+```
+db.revisions.aggregate([{
+                '$group': {
+                    '_id': { type: '$type' },
+                    'count': { $sum: 1 }
+                }
+            },
+            {
+                '$project': { 'type': '$_id.type', 'count': 1, '_id': 0 }
+            }
+
+        ])
+```
