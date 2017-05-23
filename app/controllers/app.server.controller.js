@@ -2,6 +2,49 @@
 
 var Revision = require("../models/revision");
 
+module.exports.sendShowOneData = function(req, res) {
+    console.log(req.query);
+    var title = req.query.title;
+
+    var distributionByUserAndYear;
+    var distributionByUser;
+    var distributionOfTop5;
+
+    function CDL(countdown, completion) {
+        this.signal = function() {
+            if (--countdown < 1) completion();
+        };
+    }
+    var latch = new CDL(2, function() {
+        console.log("latch.signal() was called 2 times.");
+        res.json({
+            distributionByUserAndYear: distributionByUserAndYear,
+            distributionByUser: distributionByUser,
+            distributionOfTop5: distributionOfTop5
+        });
+    });
+
+    Revision.getDataByYearAndUser(title, function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            distributionByUserAndYear = result;
+            latch.signal();
+        }
+    });
+
+    Revision.getDataByUser(title, function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            distributionByUser = result;
+            latch.signal();
+        }
+    });
+}
+
 
 module.exports.getLatest = function(req, res) {
     var title = req.query.title;
@@ -21,11 +64,6 @@ module.exports.getLatest = function(req, res) {
             numOfRevisions: numOfRevisions,
             top5Users: top5Users
         });
-        // res.json({
-        //     title: title,
-        //     numOfRevisions: numOfRevisions,
-        //     top5Users: top5Users
-        // });
     });
 
     Revision.getNumberOfRevisions(title, function(err, result) {
@@ -46,7 +84,6 @@ module.exports.getLatest = function(req, res) {
             latch.signal();
         }
     });
-    //Revision.fin
 }
 
 module.exports.sendOverallData = function(req, res) {
@@ -117,10 +154,7 @@ module.exports.showOverall = function(req, res) {
             shortestHistoryArticle: shortestHistoryArticle,
 
         });
-        // res.json("", {
-        //     pieChartData: pieChartData,
-        //     barChartData: barChartData
-        // });
+
     });
 
 
@@ -189,7 +223,6 @@ module.exports.showOverall = function(req, res) {
 }
 
 module.exports.showOne = function(req, res) {
-    //Revision.aggregate();
     Revision.getAllArticles(function(err, result) {
         if (err) {
             console.log("Get all titles failure!")

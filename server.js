@@ -15,6 +15,7 @@ app.use("/", router);
 app.use("/showOne", router);
 app.use("/revision", router);
 app.use('/OverallData', router);
+app.use('/OneData', router)
 
 app.listen(3000, function() {
     console.log("The app is running");

@@ -7,6 +7,9 @@ head
 		 type='text/css'
 		 href='/css/tablestyle.css'
 		 media='screen')
+	script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+	script(src="https://www.gstatic.com/charts/loader.js")
+	script(src="js/showOne.js")
 body
 	h2 Revision of #{title}
 	table
@@ -30,3 +33,9 @@ body
 			th #{a.user}
 			th #{a.count}
 		-}
+	button(class=title, id="Pie") Pie
+	|
+	button(class=title, id="Bar") Bar
+	|
+	button(class=title, id="User") Single User
+	div#myChart
