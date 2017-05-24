@@ -2,6 +2,41 @@
 
 var Revision = require("../models/revision");
 
+module.exports.sendUserData = function(req, res) {
+    var title = req.query.title;
+    var users = req.query.users;
+
+    var userInfo = [];
+
+    function CDL(countdown, completion) {
+        this.signal = function() {
+            if (--countdown < 1) completion();
+        };
+    }
+    var latch = new CDL(5, function() {
+        console.log("latch.signal() was called 5 times.");
+        console.log(userInfo);
+        res.json({
+            title: title,
+            userInfo: userInfo
+        });
+    });
+
+    for (var user of users) {
+        Revision.getDataForOneUser(title, user, function(err, result) {
+            if (err) {
+                console.log(err);
+            } else {
+                userInfo.push(result);
+                latch.signal();
+            }
+        })
+    }
+
+
+
+}
+
 module.exports.sendShowOneData = function(req, res) {
     console.log(req.query);
     var title = req.query.title;

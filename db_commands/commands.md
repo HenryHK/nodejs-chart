@@ -240,3 +240,27 @@ db.revisions.aggregate([{
 
     ])
 ```
+
+#### Single user
+```
+db.revisions.aggregate([{
+            '$match': {
+                'title': "Germany",
+                'user': "Lear 21"
+            }
+        },
+        {
+            '$group': {
+                '_id': { year: { $year: '$timestamp' }, user: '$user' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'year': '$_id.year', 'user': '$_id.user', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { year: 1 }
+        }
+
+    ])
+```

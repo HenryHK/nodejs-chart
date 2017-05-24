@@ -97,15 +97,68 @@ $(document).ready(function() {
         bData.splice(0, 0, content);
     });
 
+
+
     $("#Pie").on('click', function(event) {
         event.preventDefault();
         drawPie();
     })
 
     $("#Bar").on('click', function(event) {
-        console.log("clicked");
+        //console.log("clicked");
         event.preventDefault();
         drawBar();
+    })
+
+    $('#User').on('click', function(event) {
+        var users = [];
+        var ths = $(".user-data");
+        for (var index = 0; index < 5; index++) {
+            users.push(ths[index].id);
+        }
+        // var head = ['years'].concat(users);
+        // console.log(head);
+        var title = ($("#Pie")[0]).className;
+        $.get('/UserData', { title: title, users: users }, function(rdata) {
+            var title = rdata.title;
+            var info = rdata.userInfo;
+
+            var usernames = [];
+            var rows = {};
+            var index = 0;
+            for (var each of info) {
+                usernames.push(each[0].user);
+                for (var obj of each) {
+                    //console.log(obj)
+                    if (rows[obj.year] === undefined) {
+                        console.log("get undefined")
+                        rows[obj.year] = [0, 0, 0, 0, 0]
+                        rows[obj.year].splice(index, 1, obj.count);
+                    } else {
+                        rows[obj.year].splice(index, 1, obj.count);
+                    }
+                }
+                index++;
+            }
+            var head = ['years'].concat(usernames);
+            var row_data = []
+            var i = 0;
+            for (var key in rows) {
+                row_data[i] = [key.toString()].concat(rows[key]);
+                i++;
+            }
+            var bData = row_data;
+            bData.splice(0, 0, head);
+            graphData = new google.visualization.DataTable();
+            var data = google.visualization.arrayToDataTable(bData);
+            var chart = new google.charts.Bar($("#myChart")[0]);
+            var options = {
+                'title': "Top 5 Bar Chart",
+                'width': 700,
+                'height': 300
+            };
+            chart.draw(data, options);
+        });
     })
 
 });

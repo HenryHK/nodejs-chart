@@ -242,7 +242,28 @@ RevisionSchema.statics.getDataByYearAndUser = function(title, callback) {
 }
 
 RevisionSchema.statics.getDataForOneUser = function(title, user, callback) {
+    var dataForOneUserPipeline = [{
+            '$match': {
+                'title': title,
+                'user': user
+            }
+        },
+        {
+            '$group': {
+                '_id': { year: { $year: '$timestamp' }, user: '$user' },
+                'count': { $sum: 1 }
+            }
+        },
+        {
+            '$project': { 'year': '$_id.year', 'user': '$_id.user', 'count': 1, '_id': 0 }
+        },
+        {
+            '$sort': { year: 1 }
+        }
 
+    ];
+
+    return this.aggregate(dataForOneUserPipeline).exec(callback)
 }
 
 //*****************************************************************/

@@ -30,7 +30,7 @@ body
 			th Num
 		-for(var a of top5Users){
 		tr
-			th #{a.user}
+			th(id=a.user class="user-data") #{a.user}
 			th #{a.count}
 		-}
 	button(class=title, id="Pie") Pie
