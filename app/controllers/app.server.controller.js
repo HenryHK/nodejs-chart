@@ -2,6 +2,112 @@
 
 var Revision = require("../models/revision");
 
+module.exports.showIndex = function(req, res) {
+    var mostRevisedArticle;
+    var leastRevisedArticle;
+    var articleWithLargestGroupOfUsers;
+    var articleWithSmallestGroupOfUsers
+    var longestHistoryArticle;
+    var shortestHistoryArticle;
+    var article;
+
+    var pieChartData;
+    var barChartData;
+
+    function CDL(countdown, completion) {
+        this.signal = function() {
+            if (--countdown < 1) completion();
+        };
+    }
+    var latch = new CDL(7, function() {
+        console.log("latch.signal() was called 7 times.");
+        res.render("index.pug", {
+            mostRevisedArticle: mostRevisedArticle,
+            leastRevisedArticle: leastRevisedArticle,
+            articleWithLargestGroupOfUsers: articleWithLargestGroupOfUsers,
+            articleWithSmallestGroupOfUsers: articleWithSmallestGroupOfUsers,
+            longestHistoryArticle: longestHistoryArticle,
+            shortestHistoryArticle: shortestHistoryArticle,
+            article: article
+        });
+
+    });
+
+    /*get all titles*/
+    Revision.getAllArticles(function(err, result) {
+        if (err) {
+            console.log("Get all titles failure!")
+        } else {
+            console.log(result);
+            article = result;
+            latch.signal();
+        }
+    });
+
+    /*Overall data*/
+    Revision.findMostRevisedArticle(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+            mostRevisedArticle = result[0]._id;
+            latch.signal();
+        }
+    });
+
+    Revision.findLeastRevisedArticle(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+
+            leastRevisedArticle = result[0]._id;
+            latch.signal();
+        }
+    });
+
+    Revision.findArticleWithLargestGroupOfUsers(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+
+            articleWithLargestGroupOfUsers = result[0]._id.title;
+            latch.signal();
+        }
+    });
+
+    Revision.findArticleWithSmallestGroupOfUsers(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+
+            articleWithSmallestGroupOfUsers = result[0]._id.title;
+            latch.signal();
+        }
+    });
+
+    Revision.findLongestHistoryArticle(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(result);
+
+            longestHistoryArticle = result[0].title;
+            latch.signal();
+        }
+    });
+
+    Revision.findShortestHistoryArticle(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+
+            shortestHistoryArticle = result[0].title;
+            latch.signal();
+        }
+    });
+}
+
 module.exports.sendUserData = function(req, res) {
     var title = req.query.title;
     var users = req.query.users;
@@ -94,7 +200,7 @@ module.exports.getLatest = function(req, res) {
     }
     var latch = new CDL(2, function() {
         console.log("latch.signal() was called 2 times.");
-        res.render("revision.pug", {
+        res.json({
             title: title,
             numOfRevisions: numOfRevisions,
             top5Users: top5Users

@@ -9,6 +9,6 @@ router.get('/OneData', controller.sendShowOneData);
 router.get('/OverallData', controller.sendOverallData);
 router.get('/showOne', controller.showOne);
 router.get('/revision', controller.getLatest);
-router.get('/', controller.showOverall);
+router.get('/', controller.showIndex);
 
 module.exports = router

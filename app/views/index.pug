@@ -1,0 +1,39 @@
+doctype html
+
+html(lang="en")
+head
+	title  Overall
+	script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+	script(src="https://www.gstatic.com/charts/loader.js")
+	script(src="js/showOverall.js")
+
+body
+
+h1 Overall Data
+	
+div
+	p The most revised article is #{mostRevisedArticle}
+	p The least revised article is #{leastRevisedArticle}
+	p The article edited by the most number of users is #{articleWithLargestGroupOfUsers}
+	p The article edited by the least number of users is #{articleWithSmallestGroupOfUsers}
+	p The longest history article is #{longestHistoryArticle}
+	p The shortest history revised article is #{shortestHistoryArticle}
+	button#pie Pie Chart
+	|
+	button#bar Bar Chart
+	br
+	div#myChart
+	br
+
+h1 Individual Data
+
+form
+	select(name='title')
+		-for (var a of article){
+			option(value=a.title) #{a.title}
+		-}
+	button(id='submit') submit
+div#individual
+br
+div#charts
+div#myChart1
