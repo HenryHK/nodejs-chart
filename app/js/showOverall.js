@@ -107,6 +107,11 @@ $(document).ready(function() {
 
     $("#submit").on('click', function(event) {
         event.preventDefault();
+        $("#myChart1").html("");
+        $("#charts").html("");
+        $("#individual").html("");
+
+
         var title = $("select[name=title]").val();
         $.get("/revision", { title: title }, function(rdata) {
             console.log(rdata);
@@ -128,7 +133,7 @@ $(document).ready(function() {
                 tbdy.appendChild(tr);
             }
             tbl.appendChild(tbdy);
-            $("#individual").after(header, line, tbl);
+            $("#individual").append(header, line, tbl);
 
             var button1 = document.createElement('button');
             var button2 = document.createElement('button');
@@ -144,7 +149,23 @@ $(document).ready(function() {
             button3.setAttribute("id", "User");
             button3.innerText = "User"
 
-            $("#charts").prepend(button1, button2, button3)
+            var form = document.createElement('select');
+            form.setAttribute("multiple", "")
+            form.setAttribute('id', "select-user");
+            //form.setAttribute("multiple");
+            for (var i = 0; i < 5; i++) {
+                var input = document.createElement('option');
+                // var label = document.createElement('label');
+                input.setAttribute('value', rdata.top5Users[i].user);
+                //input.setAttribute('type', "checkbox");
+                input.setAttribute('class', "username");
+                input.innerText = rdata.top5Users[i].user;
+                //input.appendChild(label);
+                form.appendChild(input);
+            }
+
+
+            $("#charts").prepend(button1, button2, button3, document.createElement('br'), form);
 
             $("#Pie").on('click', function(event) {
                 event.preventDefault();
@@ -243,14 +264,16 @@ $(document).ready(function() {
             $("#User").on('click', function(event) {
                 event.preventDefault();
                 var users = [];
-                var ths = $(".user-data");
-                for (var index = 0; index < 5; index++) {
-                    users.push(ths[index].id);
+                var ths = $("#select-user").find(":selected");
+                console.log(ths[0].value)
+                for (var index = 0; index < ths.length; index++) {
+                    users.push(ths[index].value);
                 }
                 // var head = ['years'].concat(users);
                 // console.log(head);
                 var title = ($("#Pie")[0]).className;
                 $.get('/UserData', { title: title, users: users }, function(rdata) {
+                    console.log(users)
                     var title = rdata.title;
                     var info = rdata.userInfo;
 
@@ -263,7 +286,11 @@ $(document).ready(function() {
                             //console.log(obj)
                             if (rows[obj.year] === undefined) {
                                 console.log("get undefined")
-                                rows[obj.year] = [0, 0, 0, 0, 0]
+                                var temp = [];
+                                for (var i = 0; i < users.length; i++) {
+                                    temp.push(0);
+                                }
+                                rows[obj.year] = temp;
                                 rows[obj.year].splice(index, 1, obj.count);
                             } else {
                                 rows[obj.year].splice(index, 1, obj.count);

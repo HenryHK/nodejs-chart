@@ -119,7 +119,7 @@ module.exports.sendUserData = function(req, res) {
             if (--countdown < 1) completion();
         };
     }
-    var latch = new CDL(5, function() {
+    var latch = new CDL(users.length, function() {
         console.log("latch.signal() was called 5 times.");
         console.log(userInfo);
         res.json({
