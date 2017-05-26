@@ -4,6 +4,7 @@ var express = require("express");
 var controller = require("../controllers/app.server.controller");
 var router = express.Router()
 
+router.get('/update', controller.updateArticle);
 router.get('/UserData', controller.sendUserData);
 router.get('/OneData', controller.sendShowOneData);
 router.get('/OverallData', controller.sendOverallData);
