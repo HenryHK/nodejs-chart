@@ -26,7 +26,7 @@ db.bot.find().forEach(function(user){
 
 db.revisions.updateMany({"anon":{"$exists":false}, "type":{"$exists":false}},{$set:{type:"regular"}})
 
-ery for convert string to date object
+query for convert string to date object
 
 db.revisions.find().forEach(function(element){
   element.timestamp = new Date(element.timestamp);
