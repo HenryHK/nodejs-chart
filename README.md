@@ -34,7 +34,20 @@ mongoimport --jsonArray --db wikipedia --collection revisions bot.json
 
 Finally, regualte the data format in database
 
+Enter mongodb shell
+
+```shell
+sudo mongo
+```
+
+switch to wikipedia db
+
 ```javascript
+use wikipedia
+```
+
+```javascript
+// run each of the following commands in mongodb shell
  
 // match admin
 db.admin.find().forEach(function(user){
@@ -60,11 +73,11 @@ db.bot.find().forEach(function(user){
         );
 })
 
-//match regular
+// match regular
 db.revisions.updateMany({"anon":{"$exists":false}, "type":{"$exists":false}},{$set:{type:"regular"}})
 
 
-//change date string to ISODate
+// change date string to ISODate
 db.revisions.find().forEach(function(element){
   element.timestamp = new Date(element.timestamp);
   db.revisions.save(element);
