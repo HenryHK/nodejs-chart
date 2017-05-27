@@ -84,6 +84,6 @@ db.revisions.find().forEach(function(element){
 })
 ```
 
-### Launch the app
+## Launch the app
 
-Open browser, navigate to `localhost:3000`, have fun.
+Open browser, navigate to [index](http://localhost:3000), have fun.
