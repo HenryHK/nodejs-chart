@@ -29,7 +29,7 @@ Secondly, translate _admin.txt_ and _bot.txt_ using _jsonifyUsers.py_. And impor
 mongoimport --jsonArray --db wikipedia --collection admin admin.json
 
 #import bot
-mongoimport --jsonArray --db wikipedia --collection revisions bot.json
+mongoimport --jsonArray --db wikipedia --collection bot bot.json
 ```
 
 Finally, regualte the data format in database
